@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, Pressable, Modal, TextInput, Button} from 'react-native';
+import { StyleSheet, View, Pressable, Modal} from 'react-native';
+import {Button, Text, Input} from 'react-native-elements'
 import React, { Component, useState, useEffect } from "react";
 import {supabase} from "../lib/supabase.js"
 import { createClient } from "@supabase/supabase-js";
@@ -75,7 +76,7 @@ export default class DatePicker extends React.Component {
     {
         return (
               <View>
-                  <Text>{this.state.date}</Text>
+                  <Text style={{paddingLeft:10, fontSize:17}}>{this.state.date}</Text>
                   <Button title="Set Time" onPress={this.handleDatePicker}/>
                   <DateTimePickerModal
                     isVisible={this.state.isDatePickerVisible}

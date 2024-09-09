@@ -31,7 +31,6 @@ export default function ScheduleScreen({navigation, route}) {
             var data = await supabase
               .rpc('get_schedule_events', {input_schedule_id:route.params.schedule_id})
             var newEvents = []
-
             setEvents(data.data)
         }
         getSchedules()
@@ -46,9 +45,13 @@ export default function ScheduleScreen({navigation, route}) {
     }
     function save()
     {}
-
+    function findRides()
+    {
+        navigation.push("Match", {schedule_id:route.params.schedule_id})
+    }
     function getValues(data)
     {
+        console.log(data)
         var newEvent = {
             event_name:data.name,
             event_start_time:data.start_time,
@@ -57,23 +60,35 @@ export default function ScheduleScreen({navigation, route}) {
             event_end_location:data.end_location,
             username: data.username,
             event_schedule_id: route.params.schedule_id,
-            event_id: data.id
+            event_id: data.id,
+            event_days: data.days,
+            start_coords: data.start_coords,
+            end_coords: data.end_coords
         }
-        var newEvents = [...events]
+        var newEvents = []
+        if (events != null)
+        {
+            newEvents = [...events]
+        }
+
         newEvents.push(newEvent)
         setEvents(newEvents)
     }
 
   return (
-          <View>
-            <FlatList data = {events}
-            renderItem = {(i) =>
-                 {
-                    return <Event values={i.item} navigation={navigation} schedule_id = {route.params.schedule_id}/>
-                 }
-                }/>
-            <EventDialogue valuesCallback = {getValues} ref = {dialogueRef} isVisible={isModalVisible} username= {user.username.data.user.email} schedule_id = {route.params.schedule_id}/>
-          <Button title="Create New Event" onPress={handleModal} />
+          <View style = {{flex:1}}>
+              <View style = {{flex:1}}>
+                <FlatList data = {events}
+                renderItem = {(i) =>
+                     {
+                        return <Event values={i.item} navigation={navigation} schedule_id = {route.params.schedule_id}/>
+                     }
+                    }/>
+                <Button style = {{ flex: 1, justifyContent: 'flexStart'}} title="Create New Event" onPress={handleModal} />
+                <EventDialogue valuesCallback = {getValues} ref = {dialogueRef} isVisible={isModalVisible} username= {user} schedule_id = {route.params.schedule_id}/>
+              </View>
+
+              <Button style = {{ flex: 1, justifyContent: 'flex-end'}} onPress={findRides} title="Find Rides"/>
           </View>
   );
 }

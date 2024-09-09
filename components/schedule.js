@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, Pressable, Modal, TextInput, Button} from 'react-native';
+import { StyleSheet, View, Pressable, Modal} from 'react-native';
+import {Button, Text, Input, Card, ListItem} from 'react-native-elements'
 import { useState, useEffect } from "react";
 import {supabase} from "../lib/supabase.js"
 import { createClient } from "@supabase/supabase-js";
@@ -21,13 +22,12 @@ export default function Schedule({navigation, name, schedule_id}) {
 
     function goSchedule()
     {
-        console.log("SINGLE ID")
-        console.log(schedule_id)
         navigation.push("Schedule",{schedule_id:schedule_id})
     }
 
   return (
-          <Pressable onPress={goSchedule} style = {{flex:1, width:"100%", height:"100px", backgroundColor:"gray"}}>
+          <ListItem>
+          <Pressable onPress={goSchedule} style = {{flex:1, width:"100%", height:"200px"}}>
             <Text>{name}</Text>
                           <Modal visible={isModalVisible} transparent={true}>
                             <Pressable onPress = {handleModal} style = {styles.modalContainer}>
@@ -38,11 +38,12 @@ export default function Schedule({navigation, name, schedule_id}) {
                                       </Pressable>
                                   </View>
                                   <Text>Name</Text>
-                                  <TextInput onChangeText={text => setName(text)} style ={styles.textInput} placeholder = "Name"></TextInput>
+                                  <Input onChangeText={text => setName(text)} style ={styles.textInput} placeholder = "Name"></Input>
                                 </Pressable>
                             </Pressable>
                           </Modal>
 
           </Pressable>
+          </ListItem>
   );
 }

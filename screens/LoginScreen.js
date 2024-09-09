@@ -1,19 +1,24 @@
-import { FlatList, StyleSheet, Text, View, Button, TextInput, Alert } from 'react-native';
+import { Button, Text, FlatList, StyleSheet, View, TextInput, Alert } from 'react-native';
+//import {Button, Text, Input} from 'react-native-elements'
 import { useState, useEffect } from "react";
 import {supabase} from "../lib/supabase.js"
 import { createClient } from "@supabase/supabase-js";
 import {styles} from "../lib/styles.js";
 
 export default function LoginScreen() {
+  const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
 
  async function signInWithEmail() {
     setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
+
     })
 
     if (error) Alert.alert(error.message)
@@ -29,6 +34,14 @@ export default function LoginScreen() {
     } = await supabase.auth.signUp({
       email: email,
       password: password,
+            options: {
+              data:
+              {
+                  firstName: firstName,
+                  lastName: lastName,
+                  phoneNumber: phoneNumber
+              }
+            }
     })
 
     if (error) Alert.alert(error.message)
@@ -37,7 +50,9 @@ export default function LoginScreen() {
   }
 
   return (
+
     <View style={styles.login_container}>
+    <Text style= {{fontSize:50}}>Login</Text>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <TextInput
           label="Email"
@@ -58,7 +73,28 @@ export default function LoginScreen() {
           placeholder="Password"
           autoCapitalize={'none'}
         />
-      </View>
+        <TextInput
+          label="First Name"
+          onChangeText={(text) => setFirstName(text)}
+          value={firstName}
+          placeholder="first name"
+          autoCapitalize={'none'}
+        />
+        <TextInput
+          label="Last Name"
+          onChangeText={(text) => setLastName(text)}
+          value={lastName}
+          placeholder="last name"
+          autoCapitalize={'none'}
+        />
+        <TextInput
+          label="Phone Number"
+          onChangeText={(text) => setPhoneNumber(text)}
+          value={phoneNumber}
+          placeholder="phone number"
+          autoCapitalize={'none'}
+        />
+</View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
       </View>

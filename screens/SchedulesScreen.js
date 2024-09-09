@@ -1,4 +1,5 @@
-import { Button, FlatList, StyleSheet, Text, View, Modal, Pressable, TextInput} from 'react-native';
+import { FlatList, StyleSheet, View, Modal, Pressable} from 'react-native';
+import {Button, Text, Input} from 'react-native-elements'
 import { useState, useEffect, useContext } from "react";
 import {supabase} from "../lib/supabase.js"
 import { createClient } from "@supabase/supabase-js";
@@ -8,6 +9,7 @@ import {UserContext, useUser} from "../lib/context.js"
 import Schedule from "../components/schedule.js"
 import 'react-native-get-random-values';
 import { v4 as uuid } from "uuid";
+
 
 export default function SchedulesScreen({navigation}) {
     const [rooms, setRooms] = useState([])
@@ -43,17 +45,20 @@ export default function SchedulesScreen({navigation}) {
 
     async function save()
     {
+        console.log("SDFLKMNDSLK")
         var newRooms = [...rooms]
         var newId = uuid()
         newRooms.push({name:newName, id: newId})
         setRooms(newRooms)
+        console.log(user.username.data.user)
+        console.log(user.username.data.user.user_metadata)
         try {
             const err = await supabase
               .from('schedules')
               .insert({
                         id: newId,
                         name: newName,
-                        username: user.data.user.email
+                        username: user.username.data.user.email
                         })
         }
         catch (err){
@@ -88,8 +93,8 @@ export default function SchedulesScreen({navigation}) {
                                         <Text style={[styles.rightBox]}>x</Text>
                                       </Pressable>
                                   </View>
-                                  <Text>Name</Text>
-                                  <TextInput onChangeText={text => setNewName(text)} style ={styles.textInput} placeholder = "Name"></TextInput>
+                                  <Text style={{fontSize:20, paddingLeft:10}}>Name</Text>
+                                  <Input onChangeText={text => setNewName(text)} style ={styles.textInput} placeholder = "Name"></Input>
                                   <Button title="Save" onPress={save} />
                                 </Pressable>
                             </Pressable>

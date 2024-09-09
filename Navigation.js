@@ -20,21 +20,17 @@ export default function Navigation({props}) {
     const [loading, setLoading] = useState(false)
 
     const getUser = async ()=>{
-        setLoading(true)
-        console.log(username)
-        setLoading(false)
     }
 
     useEffect(() => {
-        console.log("USER")
         getUser()
     },
     []);
   return (
     <UserProvider value={''}>
-        <NavigationContainer>
+        <NavigationContainer >
             <Tab.Navigator>
-              <Tab.Screen name="Home" component={HomeScreen} />
+              <Tab.Screen name="Scheduling" component={HomeScreen} />
             </Tab.Navigator>
         </NavigationContainer>
     </UserProvider>
