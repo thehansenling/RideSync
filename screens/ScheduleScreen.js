@@ -31,6 +31,9 @@ export default function ScheduleScreen({navigation, route}) {
             var data = await supabase
               .rpc('get_schedule_events', {input_schedule_id:route.params.schedule_id})
             var newEvents = []
+
+
+
             setEvents(data.data)
         }
         getSchedules()
@@ -88,7 +91,7 @@ export default function ScheduleScreen({navigation, route}) {
                 <EventDialogue valuesCallback = {getValues} ref = {dialogueRef} isVisible={isModalVisible} username= {user} schedule_id = {route.params.schedule_id}/>
               </View>
 
-              <Button style = {{ flex: 1, justifyContent: 'flex-end'}} onPress={findRides} title="Find Rides"/>
+              <Button style = {{ flex: 1, justifyContent: 'flexEnd'}} onPress={findRides} title="Find Rides"/>
           </View>
   );
 }

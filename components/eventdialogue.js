@@ -16,33 +16,42 @@ import {UserContext, useUser} from "../lib/context.js"
 
 const apiKey = "AIzaSyCc9IsKZUH2y2HfgWhsbW-SBYng3xa1-Zc"; // define API key
 const googleapi = new GooglePlacesApi(apiKey); // initialize
-
 export default class EventDialogue extends React.Component {
 
     constructor(props) {
         super();
         this.username = props.username
         this.temp_name =''
+        console.log("CONSTRUCTING")
+        console.log(props.data)
         if (props.data)
         {
             var days = props.data.event_days
-            if (!days.length || days == "[]")
+            if (!days || !days.length || days == "[]")
             {
                 days = []
             }
             else
             {
-                days = ("[" + props.data.event_days + "]").toString()
-                days = JSON.parse(days)
+                console.log(props.data)
+                days = (props.data.event_days)
+                if (typeof days != "object")
+                {
+                    days = JSON.parse(days)
+                }
+
+                console.log("WHAT")
+                console.log(days)
+
             }
 
             this.state = {
                 isDateVisible: false,
                 isModalVisible: false,
                 pickUpLocation:props.data.event_start_location,
-                startTime:props.data.event_start_time,
+                startTime:new Date(props.data.event_start_time),
                 dropOffLocation: props.data.event_end_location,
-                endTime: props.data.event_end_time,
+                endTime: new Date(props.data.event_end_time),
                 newName: props.data.event_name,
                 days: days,
                 id: props.data.event_id,
@@ -60,28 +69,12 @@ export default class EventDialogue extends React.Component {
                 dropOffLocation: '',
                 startTime:new Date(),
                 endTime:new Date(),
-                days:[],
                 id:'',
                 selectedIndex: 0,
                 startCoords: [0, 0],
                 endCoords : [0, 0]
             }
         }
-        this.dateSelector =
-              this.dateSelector = <SelectMultipleWeekDays
-                style = {{flex:1}}
-                selectableDays={["sun", "mon", "tue", "wed", "thu", "fri", "sat"]}
-                containerStyle={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginVertical: 10,
-                }}
-                initialWeekDays = {this.state.days}
-                bubblesInitialColor={"grey"}
-                bubblesSelectedColor={"green"}
-                size={50}
-                onChange={(day) => this.setState({days:day})}
-              />
 
         this.props = props
         this.handleModal = this.handleModal.bind(this)
@@ -96,6 +89,7 @@ export default class EventDialogue extends React.Component {
         this.dropOffLocationRef = createRef()
         this.startTimeRef = createRef()
         this.endTimeRef = createRef()
+
     }
 
     setSelected(){
@@ -111,15 +105,18 @@ export default class EventDialogue extends React.Component {
     {
         this.temp_name = text
     }
+
     async save()
     {
+        console.log("DAYS")
+        console.log(this.state.days)
         if (!this.state.selectedIndex && !this.state.days.length)
         {
             console.warn("No weekly days selected")
             return
         }
-        var startTime = this.startTimeRef.current.getDate().toString()
-        var endTime = this.endTimeRef.current.getDate().toString()
+        var startTime = this.startTimeRef.current.getDate()
+        var endTime = this.endTimeRef.current.getDate()
         var newId = this.state.id
         this.selected = false
 
@@ -136,7 +133,7 @@ export default class EventDialogue extends React.Component {
                    end_location:this.state.dropOffLocation,
                    username: this.username.username.data.user.email,
                    schedule_id: this.props.schedule_id,
-                   days:this.state.days.toString(),
+                   days: this.state.days ? "[" + this.state.days.toString() + "]" : "[]",
                    user_full_name: this.username.username.data.user.user_metadata.firstName + " " + this.username.username.data.user.user_metadata.lastName,
                    user_phone_number: this.username.username.data.user.user_metadata.phoneNumber,
                    start_coords:this.state.startCoords,
@@ -144,16 +141,19 @@ export default class EventDialogue extends React.Component {
                    }
         if (this.state.selectedIndex)
         {
-            this.setState({days:[]})
+            data.days = "[]"
         }
         this.temp_name = ''
         const err = await supabase
           .from('events')
           .upsert(data)
-        data.start_time = this.startTimeRef.current.getDate().toString()
-        data.end_time = this.endTimeRef.current.getDate().toString()
+          console.log("SUCCESS")
+
+        data.start_time = this.startTimeRef.current.getDate()
+        data.end_time = this.endTimeRef.current.getDate()
+        console.log("AHHHH")
+        console.log(this.state)
         this.props.valuesCallback(data)
-        this.setState({days:[]})
         this.handleModal()
     }
 
@@ -209,20 +209,7 @@ export default class EventDialogue extends React.Component {
 
         if (!value)
         {
-              this.dateSelector = <SelectMultipleWeekDays
-                style = {{flex:1}}
-                selectableDays={["sun", "mon", "tue", "wed", "thu", "fri", "sat"]}
-                containerStyle={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginVertical: 10,
-                }}
-                initialWeekDays = {this.state.days}
-                bubblesInitialColor={"grey"}
-                bubblesSelectedColor={"green"}
-                size={50}
-                onChange={(day) => this.setState({days:day})}
-              />
+              this.dateSelector = this.weekdaySelector
         }
         else
         {
@@ -247,16 +234,12 @@ export default class EventDialogue extends React.Component {
         <Modal visible={this.state.isModalVisible} transparent={true}>
             <Pressable onPress = {this.handleModal} style = {styles.modalContainer}>
                 <Pressable style = {styles.itemModal}>
-                  <View style={{flexDirection: 'row', justifyContent:"flex-end"}}>
-                      <Pressable onPress={this.handleModal} style = {{backgroundColor:"red", width:"20%"}}>
-                        <Text style={[styles.rightBox]}>x</Text>
-                      </Pressable>
-                  </View>
-                  <Text style={{paddingLeft:10, fontSize:20}}>Event</Text>
-                  <Input style ={styles.textInput} placeholder = {this.state.newName ? this.state.newName : "Event Name"} onChangeText={text => this.setTempName(text)}></Input>
-                  <Text style={{paddingLeft:10, fontSize:20}}>Pick-Up Time</Text>
+
+                  <Text style={styles.dialogueHeader}>Event Name</Text>
+                  <Input containerStyle ={{height:40}} placeholder = {this.state.newName ? this.state.newName : "Event Name"} onChangeText={text => this.setTempName(text)}></Input>
+                  <Text style={styles.dialogueHeader}>Pick-Up Time</Text>
                   <DatePicker style={{paddingLeft:10}} date = {this.state.startTime} ref = {this.startTimeRef}/>
-                  <Text style={{paddingLeft:10, fontSize:20}}>Pick-Up Location</Text>
+                  <Text style={styles.dialogueHeader}>Pick-Up Location</Text>
                    <GooglePlacesAutocomplete
                        styles={{
                          container: {
@@ -266,6 +249,7 @@ export default class EventDialogue extends React.Component {
                      placeholder={this.state.dropOffLocation ? this.state.dropOffLocation : "Search"}
                      onPress={(data, details = null) => {
                        // 'details' is provided when fetchDetails = true
+                       console.log("SETTING LOCATIONs")
                        var start_coords = ''
                        googleapi.runPlaceDetails(data.place_id).then(placeDetails => {
                          console.log(placeDetails.geometry.location);
@@ -281,9 +265,9 @@ export default class EventDialogue extends React.Component {
                        components: 'country:us',
                      }}
                    />
-                  <Text style={{paddingLeft:10, fontSize:20}}>Drop-Off Time</Text>
+                  <Text style={styles.dialogueHeader}>Drop-Off Time</Text>
                   <DatePicker date = {this.state.endTime} ref = {this.endTimeRef}/>
-                  <Text style={{paddingLeft:10, fontSize:20}}>Drop-Off Location</Text>
+                  <Text style={styles.dialogueHeader}>Drop-Off Location</Text>
                    <GooglePlacesAutocomplete
                        styles={{
                          container: {
@@ -317,7 +301,7 @@ export default class EventDialogue extends React.Component {
                       onPress={(value) => {
                         this.selectWeekly(value);
                       }}
-                     containerStyle={{ marginBottom: 20 }}
+                     containerStyle={{ marginBottom: 0 }}
                    />
                   <DateTimePickerModal
                     isVisible={this.state.isDateVisible}
@@ -325,8 +309,27 @@ export default class EventDialogue extends React.Component {
                     onConfirm={(date)=>this.handleConfirm(date)}
                     onCancel={this.handleDate}
                   />
-                  <Text style={{paddingLeft:10, fontSize:17}}>{this.state.startTime && this.state.selectedIndex ? this.state.startTime.toLocaleString('default', { month: 'long' }) + " " + new Date(this.state.startTime).getDate(): ""}</Text>
-                  { this.dateSelector }
+                  <Text style={styles.dialogueHeader}>{this.state.startTime && this.state.selectedIndex ? this.state.startTime.toLocaleString('default', { month: 'long' }) + " " + new Date(this.state.startTime).getDate(): ""}</Text>
+                  {!this.state.selectedIndex ?
+                            <SelectMultipleWeekDays
+                              style = {{flex:1}}
+                              selectableDays={["sun", "mon", "tue", "wed", "thu", "fri", "sat"]}
+                              containerStyle={{
+                                justifyContent: "center",
+                                alignItems: "center",
+                                marginVertical: 10,
+                              }}
+                              initialWeekDays = {this.state.days}
+                              bubblesInitialColor={"grey"}
+                              bubblesSelectedColor={"green"}
+                              size={35}
+                              onChange={(day) => this.setState({days:day})}
+                            /> :
+                  <View>
+                        <Button title="Select Date" onPress={this.handleDate}/>
+                    </View>}
+
+
                   <Button title="Save" onPress={this.save} />
                 </Pressable>
 

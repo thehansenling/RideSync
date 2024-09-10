@@ -31,15 +31,13 @@ export default function MatchScreen({navigation, route}) {
                 var start_coords = inputs[2]
                 var end_coords = inputs[3]
                 var  input = {input_start_time:start_time, input_end_time:end_time, input_start_coords:start_coords, input_end_coords:end_coords}
-                console.log(input)
                 return new Promise(async (resolve, reject) => {
                         var data = await supabase
                           .rpc('get_matching_events', input)
                         resolve(data.data);
                        });
             }
-            console.log("ASDFLKNDSKLFFNl")
-            console.log("SDFLKSND")
+
             var schedule_response = await supabase
               .rpc('get_schedule_events', {input_schedule_id:route.params.schedule_id})
             var newEvents = []
@@ -50,9 +48,6 @@ export default function MatchScreen({navigation, route}) {
                 promises.push([event.event_start_time,event.event_end_time,event.event_start_coords,event.event_end_coords, event.event_id])
 
             }
-            console.log(schedule_response.data)
-            console.log("SDLFKNKSLDn")
-            console.log(promises)
             Promise.all(promises.map(matchFunction)).then(results => {
                 var new_matches = {}
                 var final_matches = {}
@@ -65,47 +60,102 @@ export default function MatchScreen({navigation, route}) {
 
                 for (var event_id in new_matches)
                 {
-
+                    console.log("EVENT ID")
+                    console.log(event_id)
                     var final_event_matches = []
                     var event_name = ''
-//                    var matching_event = null
-//                    for (var event_index in new_matches[event_id])
-//                    {
-//                         var potential_match = new_matches[event_id][event_index]
-//                         if (potential_match.event_id == event_id)
-//                         {
-//                            matching_event = potential_match
-//                         }
-//                    }
-
+                    var matching_event = null
                     for (var event_index in new_matches[event_id])
                     {
-                        console.log("MATCHES")
-                        console.log(new_matches[event_id][event_index])
+                         var potential_match = new_matches[event_id][event_index]
+                         if (potential_match.event_id == event_id)
+                         {
+                            matching_event = potential_match
+                            break
+                         }
+                    }
+                    event_name = matching_event.event_name
+                    console.log(event_name)
+                    for (var event_index in new_matches[event_id])
+                    {
+
                         var potential_match = new_matches[event_id][event_index]
                         //NEED TO ADD DAY / DATE COMPARISON
 //                        console.log(user.username.data.user)
 //                        console.log(user.username.data.user.email)
 //                        console.log(potential_match.event_username)
+
                         if (potential_match.event_id != event_id &&
-                            potential_match.event_username != user.username.data.user.email
-//                            (matching_event.event_days == [] &&
-//                                ((potential_match.event_days == [] ||
-//                                 matching_event.event_start_time.getDay() in potential_match.event_days)) ||
-//                                 (matching_event)
-//                            (matching_event.event_days != [] &&
-//                            (matching_event.event_days.filter(value => potential_match.event_days.includes(value)).length))
-                            )
-                        {
-                            final_event_matches.push(potential_match)
+                            potential_match.event_username != user.username.data.user.email)
+                            {
+
+                            console.log("GOT IN")
+                            console.log(matching_event.event_days != "[]")
+                            console.log(matching_event.event_name)
+                            console.log(matching_event.event_start_time)
+                            console.log(matching_event.event_days)
+                            console.log(JSON.parse(new Date(matching_event.event_start_time).getDay()))
+                            console.log(matching_event.event_days == "[]" )
+
+                            //console.log([JSON.parse(new Date(matching_event.event_start_time).getDay())].filter(value => potential_match.event_days.includes(value)).length)
+                            if (potential_match.event_days == "[]")
+                            {
+                                potential_match.event_days = []
+                            }
+                            else if (typeof potential_match.event_days != "object")
+                            {
+                                console.log("AHHHG")
+                                potential_match.event_days = JSON.parse(potential_match.event_days)
+                            }
+                            if (matching_event.event_days == "[]")
+                            {
+                                matching_event.event_days = []
+                            }
+                            else if (typeof matching_event.event_days != "object")
+                            {
+                                console.log("IM TIREd")
+                                console.log(matching_event.event_days)
+                                console.log(typeof matching_event.event_days)
+                                matching_event.event_days = JSON.parse(matching_event.event_days)
+
+                            }
+                            matching_event.event_start_time = new Date(matching_event.event_start_time)
+                            matching_event.event_end_time = new Date(matching_event.event_end_time)
+                            potential_match.event_start_time = new Date(potential_match.event_start_time)
+                            potential_match.event_end_time = new Date(potential_match.event_end_time)
+                            console.log("MATCHING AEAG")
+                            console.log(matching_event.event_days.length)
+                            console.log(matching_event.event_days == "[]")
+                            if(((matching_event.event_days.length == 0 || matching_event.event_days == "[]" )))
+                            {
+                                console.log("AHHSFD")
+                                console.log(matching_event.event_days)
+                                 if (matching_event.event_start_time.getDay() in potential_match.event_days ||
+                                    matching_event.event_start_time.getDay() == potential_match.event_start_time.getDay())
+                                 {
+
+                                    final_event_matches.push(potential_match)
+                                    continue
+                                 }
+                            }
+
+                            console.log(matching_event.event_days)
+                            console.log(matching_event.event_name)
+                            console.log(potential_match.event_days)
+
+                            if  (matching_event.event_days.length != 0 && matching_event.event_days != "[]" &&
+                                 matching_event.event_days.filter(value => potential_match.event_days.includes(value)).length)
+                             {
+                                final_event_matches.push(potential_match)
+                                continue
+                             }
                         }
-                        else
-                        {
-                            event_name = potential_match.event_name
-                        }
+
 
                     }
                     final_matches[event_name] = final_event_matches
+                    console.log("FINAL")
+                    console.log(final_matches)
                 }
                 setMatches(final_matches)
             });

@@ -77,7 +77,7 @@ export default class DatePicker extends React.Component {
         return (
               <View>
                   <Text style={{paddingLeft:10, fontSize:17}}>{this.state.date}</Text>
-                  <Button title="Set Time" onPress={this.handleDatePicker}/>
+                  <Button containerStyle = {{height:35}} title="Set Time" onPress={this.handleDatePicker}/>
                   <DateTimePickerModal
                     isVisible={this.state.isDatePickerVisible}
                     mode="time"
