@@ -22,8 +22,6 @@ export default class EventDialogue extends React.Component {
         super();
         this.username = props.username
         this.temp_name =''
-        console.log("CONSTRUCTING")
-        console.log(props.data)
         if (props.data)
         {
             var days = props.data.event_days
@@ -33,15 +31,11 @@ export default class EventDialogue extends React.Component {
             }
             else
             {
-                console.log(props.data)
                 days = (props.data.event_days)
                 if (typeof days != "object")
                 {
                     days = JSON.parse(days)
                 }
-
-                console.log("WHAT")
-                console.log(days)
 
             }
 
@@ -108,8 +102,6 @@ export default class EventDialogue extends React.Component {
 
     async save()
     {
-        console.log("DAYS")
-        console.log(this.state.days)
         if (!this.state.selectedIndex && !this.state.days.length)
         {
             console.warn("No weekly days selected")
@@ -147,12 +139,9 @@ export default class EventDialogue extends React.Component {
         const err = await supabase
           .from('events')
           .upsert(data)
-          console.log("SUCCESS")
 
         data.start_time = this.startTimeRef.current.getDate()
         data.end_time = this.endTimeRef.current.getDate()
-        console.log("AHHHH")
-        console.log(this.state)
         this.props.valuesCallback(data)
         this.handleModal()
     }

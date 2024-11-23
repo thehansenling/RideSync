@@ -14,14 +14,11 @@ export default function Event({navigation, values, showContact}) {
     const [name, setName] = useState(values.event_name)
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(true)
-    console.log("VALUES")
-    console.log(values)
     const [startTime, setStartTime] = useState(new Date(values.event_start_time))
     const [startLocation, setStartLocation] = useState(values.event_start_location)
     const [endTime, setEndTime] = useState(new Date(values.event_end_time))
     const [endLocation, setEndLocation] = useState(values.event_end_location)
 
-    console.log(values.event_days)
     const [days, setDays] = useState((typeof values.event_days == "object") ? [...values.event_days.sort()] : [...JSON.parse(values.event_days).sort()])
 
     const [eventData, setEventData] = useState(values)
@@ -49,8 +46,6 @@ export default function Event({navigation, values, showContact}) {
 
     function getValues(data)
     {
-        console.log("DATA")
-        console.log(data)
         setName(data.name)
         setStartTime(data.start_time)
         setEndTime(data.end_time)
@@ -60,14 +55,11 @@ export default function Event({navigation, values, showContact}) {
         setDays(data.days)
 
         setEventData(data)
-        console.log(data)
     }
 
     var days_string = ""
-    console.log(days)
     for (i in days)
     {
-        console.log(i)
         days_string += day_abbreviations[days[i]] + " "
     }
 
@@ -75,8 +67,6 @@ export default function Event({navigation, values, showContact}) {
     var start_minutes = "00"
     if (startTime)
     {
-        console.log(startTime)
-        console.log(startTime.getHours())
         start_hours = startTime.getHours()
         start_minutes = startTime.getMinutes()
         if (start_hours < 10)

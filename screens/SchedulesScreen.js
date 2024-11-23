@@ -45,13 +45,10 @@ export default function SchedulesScreen({navigation}) {
 
     async function save()
     {
-        console.log("SDFLKMNDSLK")
         var newRooms = [...rooms]
         var newId = uuid()
         newRooms.push({name:newName, id: newId})
         setRooms(newRooms)
-        console.log(user.username.data.user)
-        console.log(user.username.data.user.user_metadata)
         try {
             const err = await supabase
               .from('schedules')
@@ -62,7 +59,6 @@ export default function SchedulesScreen({navigation}) {
                         })
         }
         catch (err){
-            console.log("Error uploading bill items")
             //break
         }
         setNewName('')
@@ -79,7 +75,6 @@ export default function SchedulesScreen({navigation}) {
             <FlatList data = {rooms}
             renderItem = {(i) =>
                  {
-                      console.log(i)
                       return <Schedule name={i.item.name} schedule_id = {i.item.id} navigation={navigation}/>
                  }
                 }/>

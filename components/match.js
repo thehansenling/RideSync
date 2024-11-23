@@ -9,8 +9,6 @@ import EventDialogue from "./eventdialogue.js"
 import {UserContext, useUser} from "../lib/context.js"
 import Event from "./event.js"
 export default function Match({navigation, values}) {
-    console.log(values)
-    console.log("SDLFNSDKLf")
   return (
     <CollapsibleView title={values.event_user_full_name}>
         <Event values={values} navigation={navigation} schedule_id = {values.event_schedule_id} showContact = {true}/>

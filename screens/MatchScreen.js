@@ -18,7 +18,6 @@ export default function MatchScreen({navigation, route}) {
     const [matches, setMatches] = useState({})
     const [events, setEvents] = useState([])
     const user = useUser()
-    console.log(user.username.data)
     useEffect(() => {
 
         async function getSchedules()
@@ -51,7 +50,6 @@ export default function MatchScreen({navigation, route}) {
             Promise.all(promises.map(matchFunction)).then(results => {
                 var new_matches = {}
                 var final_matches = {}
-                console.log(results)
                 for (match_index in results)
                 {
                     var match = results[match_index]
@@ -60,8 +58,6 @@ export default function MatchScreen({navigation, route}) {
 
                 for (var event_id in new_matches)
                 {
-                    console.log("EVENT ID")
-                    console.log(event_id)
                     var final_event_matches = []
                     var event_name = ''
                     var matching_event = null
@@ -75,7 +71,6 @@ export default function MatchScreen({navigation, route}) {
                          }
                     }
                     event_name = matching_event.event_name
-                    console.log(event_name)
                     for (var event_index in new_matches[event_id])
                     {
 
@@ -89,14 +84,6 @@ export default function MatchScreen({navigation, route}) {
                             potential_match.event_username != user.username.data.user.email)
                             {
 
-                            console.log("GOT IN")
-                            console.log(matching_event.event_days != "[]")
-                            console.log(matching_event.event_name)
-                            console.log(matching_event.event_start_time)
-                            console.log(matching_event.event_days)
-                            console.log(JSON.parse(new Date(matching_event.event_start_time).getDay()))
-                            console.log(matching_event.event_days == "[]" )
-
                             //console.log([JSON.parse(new Date(matching_event.event_start_time).getDay())].filter(value => potential_match.event_days.includes(value)).length)
                             if (potential_match.event_days == "[]")
                             {
@@ -104,7 +91,6 @@ export default function MatchScreen({navigation, route}) {
                             }
                             else if (typeof potential_match.event_days != "object")
                             {
-                                console.log("AHHHG")
                                 potential_match.event_days = JSON.parse(potential_match.event_days)
                             }
                             if (matching_event.event_days == "[]")
@@ -113,9 +99,6 @@ export default function MatchScreen({navigation, route}) {
                             }
                             else if (typeof matching_event.event_days != "object")
                             {
-                                console.log("IM TIREd")
-                                console.log(matching_event.event_days)
-                                console.log(typeof matching_event.event_days)
                                 matching_event.event_days = JSON.parse(matching_event.event_days)
 
                             }
@@ -123,13 +106,8 @@ export default function MatchScreen({navigation, route}) {
                             matching_event.event_end_time = new Date(matching_event.event_end_time)
                             potential_match.event_start_time = new Date(potential_match.event_start_time)
                             potential_match.event_end_time = new Date(potential_match.event_end_time)
-                            console.log("MATCHING AEAG")
-                            console.log(matching_event.event_days.length)
-                            console.log(matching_event.event_days == "[]")
                             if(((matching_event.event_days.length == 0 || matching_event.event_days == "[]" )))
                             {
-                                console.log("AHHSFD")
-                                console.log(matching_event.event_days)
                                  if (matching_event.event_start_time.getDay() in potential_match.event_days ||
                                     matching_event.event_start_time.getDay() == potential_match.event_start_time.getDay())
                                  {
@@ -138,10 +116,6 @@ export default function MatchScreen({navigation, route}) {
                                     continue
                                  }
                             }
-
-                            console.log(matching_event.event_days)
-                            console.log(matching_event.event_name)
-                            console.log(potential_match.event_days)
 
                             if  (matching_event.event_days.length != 0 && matching_event.event_days != "[]" &&
                                  matching_event.event_days.filter(value => potential_match.event_days.includes(value)).length)
@@ -154,8 +128,6 @@ export default function MatchScreen({navigation, route}) {
 
                     }
                     final_matches[event_name] = final_event_matches
-                    console.log("FINAL")
-                    console.log(final_matches)
                 }
                 setMatches(final_matches)
             });
@@ -170,8 +142,6 @@ export default function MatchScreen({navigation, route}) {
               <FlatList data = {Object.keys(matches)}
               renderItem = {(i) =>
                    {
-                    console.log("SURE");
-
                       const event_matches = matches[i.item]
                       return <Matches events={event_matches} event_name ={i.item}/>
                    }
